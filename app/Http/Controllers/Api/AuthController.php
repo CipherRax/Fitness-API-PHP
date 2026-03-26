@@ -11,28 +11,28 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'in:member,trainer'
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed', // Added 'confirmed'
+        'role' => 'nullable|in:member,trainer'           // Changed to nullable
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'member',
-        ]);
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role ?? 'member',
+    ]);
 
-        $token = $user->createToken('fitness-app-token')->plainTextToken;
+    $token = $user->createToken('fitness-app-token')->plainTextToken;
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ], 201);
-    }
+    return response()->json([
+        'user' => $user,
+        'token' => $token
+    ], 201);
+}
 
     public function login(Request $request)
     {
